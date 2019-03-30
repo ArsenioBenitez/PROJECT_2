@@ -1,10 +1,32 @@
 var dataP = d3.json("classData.json");
 dataP.then(function(data)
 {
+  parseData(data);
   drawChart(data);
 
 })
-
+var parseData = function(data)
+{
+  var homework = [];
+  var homeworkdays = [];
+  var quizes = [];
+  var quizesdays = [];
+  data.forEach(function(d,i)
+  {
+    d[i].homework.forEach(function(d)
+  {
+  homeworkdays.push(d.day);
+  homework.push(d.grade);
+  });
+  d[i].quizes.forEach(function(d)
+  {
+  quizesdays.push(d.day);
+  quizes.push(d.day);
+  });
+  })
+  return homework,quizes;
+console.log(homework)
+}
 var drawChart = function(data)
 {
 
@@ -24,28 +46,34 @@ var drawChart = function(data)
   var width = screen.width-margins.left-margins.right;
   var height = screen.height-margins.top-margins.bottom;
   var barWidth = width/4;
-  var xScale = d3.scaleTime()
-                .domain([d3.min(data,function(d){return d.day;}),d3.max(data,function(d){return d.day;})])
-                .range([0,width]);
-  var yScale = d3.scaleLinear()
-                .domain([0,d3.max(data,function(d){return d.homework[0].max;})])
-                .range([height,0]);
-  var line = d3.line()
-               .x(function(d){return xScale(data.homework.day);})
-               .y(function(d){return yScale(data[0].homework.grade);});
-  var svg = d3.select('svg#s')
+
+  var svg = d3.select('svg')
             .attr('width',screen.width)
             .attr('height',screen.height);
-
+  var index = 0;
+  console.log(data);
   var plotLand = svg.append('g')
                 .classed("plot",true)
-                .attr("transform","translate("+margins.left+","+margins.top+")");
+                .attr("transform","translate("+margins.left+","+margins.top+")")
+                .attr('height',height-margins.top-margins.bottom)
+                .attr('width',width-margins.left-margins.right);
+  var xScale = d3.scaleTime()
+                .domain([0,40])
+                .range([0,width]);
+  var yScale = d3.scaleLinear()
+                 .domain([0,50])
+                 .range([height,0]);
 
-  var students =
-      plotLand.selectAll('path')
-      .datum(data)
-      .attr('class',"line")
-      .attr('d',line);
+
+  console.log(data[index].homework[0].day,data[index].homework[0].grade)
+  var line = d3.line()
+               .x(function(d,i){return xScale(d[0].homework[i].day);})
+               .y(function(d,i){return yScale(d[0].homework[i].grade);});
+
+  plotLand.append('path')
+          .datum(data)
+          .attr('class',"line")
+          .attr('d',line);
 
 
   // buttons
@@ -54,56 +82,26 @@ var drawChart = function(data)
        .on('click',function()
        {
 
-          if (this.name=='prev')
-          {
-            var clicked = 'prev';
-          }
-          else if (this.name=='next')
-          {
-            var clicked = 'next';
-          }
-           updateChart(data,clicked,plotLand,height);
+          index = intParse(this.name);
+          updateChart(data,index,plotLand,line);
         });
 
 
 }
 
 
-var updateChart = function(data,clicked,plotLand,h)
+var updateChart = function(data,index,plotLand,l)
 {
 
-  var day = document.getElementById("day").textContent;
-  console.log(data[0].grades);
-  if (clicked=='')
-  {
-    //do something
-    var dd = parseInt(day)-2;
-    var students =
-        plotLand.selectAll('rect')
-        .data(data[dd].grades)
-        .attr('y', function(d)
-        {
-        return  h-d.grade;
-        })
-      var p = document.getElementById('day');
-      p.innerText = dd+1;
+  var line = d3.line()
+               .x(function(d){return xScale(d[index].homework.day);})
+               .y(function(d){return yScale(d[index].homework.grade);});
+  var students =
+      plotLand.selectAll('path')
+      .datum(data)
+      .attr('class',"line")
+      .attr('d',line);
 
-  }
-  else if(clicked=='next')
-  {
-    //
-    console.log(parseInt(day));
-    var dd = parseInt(day)+1;
-    var students =
-        plotLand.selectAll('rect')
-        .data(data[dd].grades)
-        .attr('y', function(d)
-        {
-        return  h-d.grade;
-        })
-    var p = document.getElementById('day');
-    p.innerText = dd;
 
-  }
 
 };
