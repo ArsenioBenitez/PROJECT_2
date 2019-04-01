@@ -1,39 +1,33 @@
 var dataP = d3.json("classData.json");
 dataP.then(function(data)
-{
-  parseData(data);
+{console.log(data, "data")
   drawChart(data);
 
-})
-var parseData = function(data)
+},
+function(err)
 {
-  var homework = [];
-  var homeworkdays = [];
-  var quizes = [];
-  var quizesdays = [];
-  data.forEach(function(d,i)
-  {
-    d[i].homework.forEach(function(d)
-  {
-  homeworkdays.push(d.day);
-  homework.push(d.grade);
-  });
-  d[i].quizes.forEach(function(d)
-  {
-  quizesdays.push(d.day);
-  quizes.push(d.day);
-  });
-  })
-  return homework,quizes;
-console.log(homework)
-}
+  console.log(err);
+});
 var drawChart = function(data)
 {
-
+//method for manipulating data---recieved help from Daniel B. and Kristin D
+  var index = 0;
+  data[index].quizes.forEach(function(d){d.type="Quiz"});
+  data[index].homework.forEach(function(d){d.type="Homework"});
+  data[index].final.forEach(function(d){d.type="Final"});
+  data[index].test.forEach(function(d){d.type="Test"});
+  var final = data[index].final;
+  var finalAndQuiz = final.concat(data[index].quizes);
+  var finalQuizHomework=finalAndQuiz.concat(data[index].homework);
+  var allGrades=finalQuizHomework.concat(data[index].test);
+  allGrades.forEach(function(d){
+    d.percent=(d.grade/d.max)*100
+  });
+  console.log(allGrades, "all grades")
   var screen =
   {
-    width: 500,
-    height: 400
+    width: 750,
+    height: 750
   }
 
   var margins =
@@ -41,39 +35,57 @@ var drawChart = function(data)
     top:10,
     bottom:40,
     left:40,
-    right:100
+    right:10
   }
   var width = screen.width-margins.left-margins.right;
   var height = screen.height-margins.top-margins.bottom;
-  var barWidth = width/4;
 
   var svg = d3.select('svg')
             .attr('width',screen.width)
             .attr('height',screen.height);
-  var index = 0;
-  console.log(data);
-  var plotLand = svg.append('g')
-                .classed("plot",true)
-                .attr("transform","translate("+margins.left+","+margins.top+")")
-                .attr('height',height-margins.top-margins.bottom)
-                .attr('width',width-margins.left-margins.right);
-  var xScale = d3.scaleTime()
+
+  console.log(data[index].homework);
+  var xScale = d3.scaleLinear()
                 .domain([0,40])
                 .range([0,width]);
   var yScale = d3.scaleLinear()
-                 .domain([0,50])
+                 .domain([0,100])
                  .range([height,0]);
+  var plotLand = svg.append('g')
+                .classed("plot",true)
+                .attr("transform","translate("+margins.left+","+margins.top+")");
+  var colors = d3.scaleOrdinal(d3.schemeSet1);
+  var student = plotLand.selectAll('g')
+                    .data(allGrades)
+                    .enter()
+                    .append('g')
+                    .attr("fill",function(d){return colors(d.type)});
+  student.selectAll("circle")
+          .data(allGrades)
+          .enter()
+          .append('circle')
+          .attr('cx',function(d)
+          {
+              return xScale(d.day)
+          })
+          .attr('cy',function(d)
+          {
+              return yScale(d.percent)})
+
+          .attr('r',10);
 
 
-  console.log(data[index].homework[0].day,data[index].homework[0].grade)
-  var line = d3.line()
-               .x(function(d,i){return xScale(d[0].homework[i].day);})
-               .y(function(d,i){return yScale(d[0].homework[i].grade);});
 
-  plotLand.append('path')
-          .datum(data)
-          .attr('class',"line")
-          .attr('d',line);
+          var xA = margins.top+height+10;
+           var xAxis = d3.axisBottom(xScale);
+           svg.append('g').classed('xAxis',true)
+                         .call(xAxis)
+                         .attr('transform','translate('+ margins.left + ','+xA+')' );
+                  var yAxis = d3.axisLeft(yScale);
+                 var yA = margins.left-10;
+                 svg.append('g').classed('yAxis',true)
+                               .call(yAxis)
+                               .attr('transform','translate('+yA+ ','+'10'+')' );
 
 
   // buttons
@@ -82,25 +94,39 @@ var drawChart = function(data)
        .on('click',function()
        {
 
-          index = intParse(this.name);
-          updateChart(data,index,plotLand,line);
+          innn = parseInt(this.name);
+          updateChart(data,innn,plotLand,student, xScale, yScale,colors);
         });
 
 
 }
 
 
-var updateChart = function(data,index,plotLand,l)
-{
+var updateChart = function(data,index,plotLand,student, xScale, yScale,colors)
+{console.log("update")
+  data[index].quizes.forEach(function(d){d.type="Quiz"});
+  data[index].homework.forEach(function(d){d.type="Homework"});
+  data[index].final.forEach(function(d){d.type="Final"});
+  data[index].test.forEach(function(d){d.type="Test"});
+  var final = data[index].final;
+  var finalAndQuiz = final.concat(data[index].quizes);
+  var finalQuizHomework=finalAndQuiz.concat(data[index].homework);
+  var allGrades=finalQuizHomework.concat(data[index].test);
+  allGrades.forEach(function(d){
+    d.percent=(d.grade/d.max)*100
+  });
+  console.log(allGrades);
 
-  var line = d3.line()
-               .x(function(d){return xScale(d[index].homework.day);})
-               .y(function(d){return yScale(d[index].homework.grade);});
-  var students =
-      plotLand.selectAll('path')
-      .datum(data)
-      .attr('class',"line")
-      .attr('d',line);
+  student.selectAll('circle')
+    .data(allGrades)
+    .attr('cx',function(d)
+    {
+      return xScale(d.day)
+    })
+    .attr('cy',function(d)
+    {
+        return yScale(d.percent)})
+    .attr('r',10);
 
 
 
