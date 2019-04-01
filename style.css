@@ -1,0 +1,14 @@
+
+body{
+  background-color: LightYellow;
+}
+svg{
+  float:left;
+}
+div.nav{
+  float:right;
+}
+div{
+  float:right;
+  clear:both;
+}

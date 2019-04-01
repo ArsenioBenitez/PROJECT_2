@@ -26,8 +26,8 @@ var drawChart = function(data)
   console.log(allGrades, "all grades")
   var screen =
   {
-    width: 750,
-    height: 750
+    width: 600,
+    height: 500
   }
 
   var margins =
@@ -46,7 +46,7 @@ var drawChart = function(data)
 
   console.log(data[index].homework);
   var xScale = d3.scaleLinear()
-                .domain([0,40])
+                .domain([0,41])
                 .range([0,width]);
   var yScale = d3.scaleLinear()
                  .domain([0,100])
@@ -58,8 +58,7 @@ var drawChart = function(data)
   var student = plotLand.selectAll('g')
                     .data(allGrades)
                     .enter()
-                    .append('g')
-                    .attr("fill",function(d){return colors(d.type)});
+                    .append('g');
   student.selectAll("circle")
           .data(allGrades)
           .enter()
@@ -72,7 +71,27 @@ var drawChart = function(data)
           {
               return yScale(d.percent)})
 
-          .attr('r',10);
+          .attr('r',5)
+          .attr("fill",function(d)
+          {
+            if(d.type=="Quiz")
+            {
+              return 'red';
+            }
+            else if(d.type=="Homework")
+            {
+              return 'blue';
+            }
+            else if(d.type=="Test")
+            {
+              return 'green';
+            }
+            else if(d.type=="Final")
+            {
+              return 'pink';
+            }
+
+          });
 
 
 
@@ -89,21 +108,54 @@ var drawChart = function(data)
 
 
   // buttons
-  var buttons =
+  var images =
       d3.selectAll('img')
        .on('click',function()
        {
 
           innn = parseInt(this.name);
-          updateChart(data,innn,plotLand,student, xScale, yScale,colors);
+          view= 'scatter';
+          updateChart(data,innn,plotLand,student, xScale, yScale,colors,view,height);
         });
-
+var change_view =
+      d3.select('button')
+      .attr('x',100)
+      .attr('y',200)
+      .on('click',function()
+      {
+        inn = index;
+        view='line';
+        updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height);
+      });
+var getClassAvg = d3.select("#average")
+                    .on('click',function()
+                    {console.log("button works")
+                      view = 'classAv';
+                      inn = index;
+                      updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height);
+                    })
+// var days = d3.select('<.days>')
+//               .on('click',function()
+//               {
+//                 if(this.name=='prev')
+//                 {
+//                   var inn = -1;
+//
+//                 }
+//                 if (this.name=="next")
+//                 {
+//                   var inn=1;
+//                 }
+//                 updateChart(data, inn, plotLand, student, xScale, yScale, colors, "classAv", height)
+//               })
 
 }
 
 
-var updateChart = function(data,index,plotLand,student, xScale, yScale,colors)
-{console.log("update")
+var updateChart = function(data,index,plotLand,student, xScale, yScale,colors,view,height)
+{//console.log("update")
+if(view=='scatter')
+{
   data[index].quizes.forEach(function(d){d.type="Quiz"});
   data[index].homework.forEach(function(d){d.type="Homework"});
   data[index].final.forEach(function(d){d.type="Final"});
@@ -126,8 +178,55 @@ var updateChart = function(data,index,plotLand,student, xScale, yScale,colors)
     .attr('cy',function(d)
     {
         return yScale(d.percent)})
-    .attr('r',10);
+    .attr('r',5);
+}
+if(view=='line')
+{
+  xScale=d3.scaleTime()
+          .domain([0,40]);
+  yScale=d3.scaleLinear()
+          .domain([0,100])
+          .range([height,0]);
+  var line = d3.line()
+  .x(function(d){return xScale(d.day)})
+  .y(function(d){return yScale(d.percent)});
+  console.log(line)
 
+  plotLand.append('path')
+  .datum(allGrades)
+  .attr('class','line')
+  .attr('d',line);
+}
+if(view=='classAv')
+{
+  data.forEach(function(d){d.quizes.forEach(function(d){d.type="Quiz"});})
+  data.forEach(function(d){d.homework.forEach(function(d){d.type="Homework"});})
+  data.forEach(function(d){d.final.forEach(function(d){d.type="Final"});})
+  data.forEach(function(d){d.test.forEach(function(d){d.type="Test"});})
+console.log(data)
+  var final=data.forEach(function(d){return d.final})
+  var quiz=data.forEach(function(d){return d.quizes})
+  var finalAndQuiz=final.concat(quiz)
+  var homework=data.forEach(function(d){d.homework.forEach(function(d){return d.grade})})
+  var finalQuizHomework=finalAndQuiz.concat(homework)
+  var test=data.forEach(function(d){d.homework.forEach(function(d){return d.grade})})
+  var allGrades=finalQuizHomework.concat(test)
 
+  console.log(final, "final")
+
+  allGrades.forEach(function(d){
+    d.percent=(d.grade/d.max)*100
+  });
+  student.selectAll('circle')
+    .data(allGrades)
+    .attr('cx',function(d)
+    {
+      return xScale(d.day)
+    })
+    .attr('cy',function(d)
+    {
+        return yScale(d.percent)})
+    .attr('r',5);
+}
 
 };
