@@ -112,7 +112,7 @@ var drawChart = function(data)
        .on('click',function()
        {
           innn = parseInt(this.name);
-          view= 'line';
+          view= 'scatter';
           updateChart(data,innn,plotLand,student, xScale, yScale,colors,view,height, width);
         });
 var change_view =
