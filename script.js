@@ -1,6 +1,6 @@
 var dataP = d3.json("classData.json");
 dataP.then(function(data)
-{console.log(data, "data")
+{
   drawChart(data);
 
 },
@@ -23,7 +23,7 @@ var drawChart = function(data)
   allGrades.forEach(function(d){
     d.percent=(d.grade/d.max)*100
   });
-  console.log(allGrades, "all grades")
+
   var screen =
   {
     width: 600,
@@ -44,7 +44,6 @@ var drawChart = function(data)
             .attr('width',screen.width)
             .attr('height',screen.height);
 
-  console.log(data[index].homework);
   var xScale = d3.scaleLinear()
                 .domain([0,41])
                 .range([0,width]);
@@ -112,9 +111,8 @@ var drawChart = function(data)
       d3.selectAll('img')
        .on('click',function()
        {
-
           innn = parseInt(this.name);
-          view= 'scatter';
+          view= 'line';
           updateChart(data,innn,plotLand,student, xScale, yScale,colors,view,height, width);
         });
 var change_view =
@@ -167,7 +165,6 @@ if(view=='scatter')
   allGrades.forEach(function(d){
     d.percent=(d.grade/d.max)*100
   });
-  console.log(allGrades);
 
   student.selectAll('circle')
     .data(allGrades)
