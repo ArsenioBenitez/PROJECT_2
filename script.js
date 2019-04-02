@@ -115,7 +115,7 @@ var drawChart = function(data)
 
           innn = parseInt(this.name);
           view= 'scatter';
-          updateChart(data,innn,plotLand,student, xScale, yScale,colors,view,height);
+          updateChart(data,innn,plotLand,student, xScale, yScale,colors,view,height, width);
         });
 var change_view =
       d3.select('button')
@@ -125,14 +125,14 @@ var change_view =
       {
         inn = index;
         view='line';
-        updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height);
+        updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height, width);
       });
 var getClassAvg = d3.select("#average")
                     .on('click',function()
-                    {console.log("button works")
+                    {
                       view = 'classAv';
                       inn = index;
-                      updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height);
+                      updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height, width);
                     })
 // var days = d3.select('<.days>')
 //               .on('click',function()
@@ -152,7 +152,7 @@ var getClassAvg = d3.select("#average")
 }
 
 
-var updateChart = function(data,index,plotLand,student, xScale, yScale,colors,view,height)
+var updateChart = function(data,index,plotLand,student, xScale, yScale,colors,view,height, width)
 {//console.log("update")
 if(view=='scatter')
 {
@@ -182,21 +182,92 @@ if(view=='scatter')
 }
 if(view=='line')
 {
+data[index].quizes.forEach(function(d){d.type="Quiz"});
+data[index].homework.forEach(function(d){d.type="Homework"});
+data[index].final.forEach(function(d){d.type="Final"});
+data[index].test.forEach(function(d){d.type="Test"});
+var final = data[index].final;
+var finalAndQuiz = final.concat(data[index].quizes);
+var quiz=data[index].quizes;
+var finalQuizHomework=finalAndQuiz.concat(data[index].homework);
+var homework=data[index].homework;
+var allGrades=finalQuizHomework.concat(data[index].test);
+var test=data[index].test;
+quiz.forEach(function(d){
+  d.quizPercent=(d.grade/d.max)*100
+});
+test.forEach(function(d){
+  d.testPercent=(d.grade/d.max)*100
+});
+homework.forEach(function(d){
+  d.homeworkPercent=(d.grade/d.max)*100
+});
+final.forEach(function(d){
+  d.finalPercent=(d.grade/d.max)*100
+});
   xScale=d3.scaleTime()
-          .domain([0,40]);
+          .domain([0,41])
+          .range([0, width])
   yScale=d3.scaleLinear()
           .domain([0,100])
           .range([height,0]);
-  var line = d3.line()
-  .x(function(d){return xScale(d.day)})
-  .y(function(d){return yScale(d.percent)});
-  console.log(line)
 
-  plotLand.append('path')
-  .datum(allGrades)
-  .attr('class','line')
-  .attr('d',line);
-}
+  var quizLine=d3.line()
+  .x(function(d){
+      return xScale(parseInt(d.day))})
+  .y(function(d){
+    return yScale(d.quizPercent)})
+
+    plotLand.append('path')
+      .datum(quiz)
+      .attr('class','line')
+      .attr('d',quizLine)
+      .attr("fill", "none")
+      .attr("stroke", "red")
+
+      var homeworkLine=d3.line()
+      .x(function(d){
+          return xScale(parseInt(d.day))})
+      .y(function(d){
+        return yScale(d.homeworkPercent)})
+
+        plotLand.append('path')
+          .datum(homework)
+          .attr('class','line')
+          .attr('d',homeworkLine)
+          .attr("fill", "none")
+          .attr("stroke", "blue")
+
+          var testLine=d3.line()
+          .x(function(d){
+              return xScale(parseInt(d.day))})
+          .y(function(d){
+            return yScale(d.testPercent)})
+
+            plotLand.append('path')
+              .datum(test)
+              .attr('class','line')
+              .attr('d',testLine)
+              .attr("fill", "none")
+              .attr("stroke", "green")
+
+              var homeworkLine=d3.line()
+              .x(function(d){
+                  return xScale(parseInt(d.day))})
+              .y(function(d){
+                return yScale(d.finalPercent)})
+
+                plotLand.append('path')
+                  .datum(final)
+                  .attr('class','line')
+                  .attr('d',finalLine)
+                  .attr("fill", "none")
+                  .attr("stroke", "green")
+    }
+
+
+
+
 if(view=='classAv')
 {
   data.forEach(function(d){d.quizes.forEach(function(d){d.type="Quiz"});})
@@ -230,3 +301,4 @@ console.log(data)
 }
 
 };
+
