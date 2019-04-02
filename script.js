@@ -119,10 +119,13 @@ var change_view =
       d3.select('button')
       .attr('x',100)
       .attr('y',200)
-      .on('click',function()
-      {
-        //inn = index;
-        view='line';
+    .on('click',function()
+
+  {//if (index==0){
+   //inn=0
+  //}
+  console.log(inn, "inn")
+      view='line';
         updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height, width);
       });
 var getClassAvg = d3.select("#average")
@@ -298,5 +301,4 @@ console.log(data)
 }
 
 };
-
 
