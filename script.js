@@ -111,9 +111,9 @@ var drawChart = function(data)
       d3.selectAll('img')
        .on('click',function()
        {
-          innn = parseInt(this.name);
+          inn = parseInt(this.name);
           view= 'scatter';
-          updateChart(data,innn,plotLand,student, xScale, yScale,colors,view,height, width);
+          updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height, width);
         });
 var change_view =
       d3.select('button')
@@ -121,7 +121,7 @@ var change_view =
       .attr('y',200)
       .on('click',function()
       {
-        inn = index;
+        //inn = index;
         view='line';
         updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height, width);
       });
@@ -298,4 +298,5 @@ console.log(data)
 }
 
 };
+
 
