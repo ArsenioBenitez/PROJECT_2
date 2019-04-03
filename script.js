@@ -124,7 +124,7 @@ var change_view =
   {//if (index==0){
    //inn=0
   //}
-  console.log(inn, "inn")
+  //console.log(inn, "inn")
       view='line';
         updateChart(data,inn,plotLand,student, xScale, yScale,colors,view,height, width);
       });
@@ -301,4 +301,3 @@ console.log(data)
 }
 
 };
-
