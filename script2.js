@@ -23,7 +23,7 @@ var drawChart = function(data)
     {
          grade: s.homework[i].grade,
          day: day,
-         index: i,
+         index: s.picture,
          type:'homework'
     }
        allGrades.push(grades)
@@ -38,7 +38,7 @@ var drawChart = function(data)
     {
          grade: s.quizes[i].grade,
          day: day,
-         index:i,
+         index:s.picture,
          type:'quiz'
     }
        allGrades.push(grades)
@@ -53,7 +53,7 @@ var drawChart = function(data)
     {
          grade: s.test[i].grade,
          day: day,
-         index:i,
+         index:s.picture,
          type:'test'
     }
        allGrades.push(grades)
@@ -64,15 +64,15 @@ var drawChart = function(data)
     var day = d.day;
     data.forEach(function(s)
     {//s is each student
-
     var grades =
     {
          grade: s.final[i].grade,
          day: day,
-         index:i,
+         index:s.picture,
          type:'final'
 
     }
+    ;
        allGrades.push(grades)
     });
   });
@@ -194,9 +194,7 @@ var plotLand = svg.append('g')
 //make line
 var drawLine = d3.line()
                .x(function(d,i){
-                 console.log(d, "d")
-                 console.log(d.day, "d.day")
-                 return xScale(d.day)})
+                 return xScale(i)})
                .y(function(d){return yScale(d.average)})
                .curve(d3.curveCardinal);
 plotLand.append('path')
@@ -205,8 +203,115 @@ plotLand.append('path')
      .attr('d',drawLine)
      .attr("fill", "none")
      .attr("stroke", "red");
+var images =
+         d3.selectAll('img')
+          .on('mouseover',function()
+          {
+             name = parseInt(this.name);
+             updateChart(data,gradesByDays,listDays,plotLand,name,xScale,yScale);
+           })
+           .on('mouseout',);
+
 }
-var updateChart = function(data)
+
+
+
+
+
+
+
+
+
+
+
+var updateChart = function(data,gradesByDays,listDays,plotLand,name,xScale,yScale)
 {
-  
+
+gradesByStudent = [];
+data.forEach(function(s,i)
+{//d is each student
+  var student = i;
+  var grades = [];
+  gradesByDays.forEach(function(g,j)
+  {//g is a list grades for everyday
+    g.forEach(function(d)
+    {//d is a grade object
+      if(d.index==data[student].picture)
+      {//if d belongs to student
+        grades.push(d);
+      }})
+
+  })
+
+  gradesByStudent.push(grades);
+
+})
+//console.log(gradesByDays,gradesByStudent);
+//calculate individual averages
+var studentAveragesByDay = []
+listDays.forEach(function(d,i)
+{//list of days
+  var types = 0;
+  var hw_total =0;
+  var qz_total =0;
+  var tt_total=0;
+  var fl_total = 0;
+  var avg = 0;
+  var days = [];
+  gradesByStudent.forEach(function(g)
+  {//g is each students grades
+    if(g[i].type=="homework")
+    {
+      hw_total=g[i].grade*2;
+    }
+    else if(g[i].type=="quiz")
+    {
+      qz_total=g[i].grade*10;
+    }
+    else if(g[i].type=="test")
+    {
+      tt_total=g[i].grade;
+    }
+    else if(g[i].type=="final")
+    {
+      fl_total=g[i].grade;
+    }
+    total = ((hw_total*.15)+(qz_total*.15)+(tt_total*.20)+(fl_total*.3))/.8;
+    if(i==14||i==29)
+    {
+       avg = tt_total;
+    }
+    else if(i==40)
+    {
+       avg = fl_total;
+    }
+    else if(i%2==1&&i!=29)
+    {
+       avg = total/.3;
+    }
+    else
+    {
+       avg = qz_total;
+    }
+    var individualAv =
+    {
+      average: avg,
+      day: i
+    }
+    days.push(individualAv);
+})
+studentAveragesByDay.push(days);
+})
+//console.log(studentAveragesByDay);
+var drawLine = d3.line()
+                  .x(function(d,i){
+                    return xScale(i)})
+                    .y(function(d){return yScale(d.average)})
+                    .curve(d3.curveCardinal);
+plotLand.append('path')
+        .datum(studentAveragesByDay[name])
+        .attr('class',"line")
+        .attr('d',drawLine)
+        .attr("fill", "none")
+        .attr("stroke", "blue");
 }
