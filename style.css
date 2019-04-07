@@ -12,3 +12,15 @@ div{
   float:right;
   clear:both;
 }
+
+img{
+  margin-left: 0px;
+  margin-right:0px;
+}
+img:hover {
+  transform: scale(1.5);
+}
+
+.hidden{
+  opacity:0;
+}

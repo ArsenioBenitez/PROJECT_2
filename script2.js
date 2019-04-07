@@ -171,7 +171,7 @@ var margins =
 var width = screen.width-margins.left-margins.right;
 var height = screen.height-margins.top-margins.bottom;
 
-var svg = d3.select('svg')
+var svg = d3.select('#lineChart')
           .attr('width',screen.width)
           .attr('height',screen.height);
 //setup scales
@@ -224,7 +224,40 @@ plotLand.append('path')
      .attr('d',drawLine)
      .attr("fill", "none")
      .attr("stroke", "red")
-     .attr("stroke-width", 3);
+     .attr("stroke-width", 3)
+
+    plotLand.selectAll("circle")
+    .data(averagesByDay)
+    .enter()
+    .append("circle")
+     .attr("class", "dot")
+     .attr("cx", function(d,i){return xScale(i)})
+     .attr("cy", function(d){return yScale(d.average)} )
+     .attr("r", 5)
+     .attr("fill", "red")
+
+     .on("mouseover", function(d, i){
+       plotLand.append("rect")
+       .attr("x", xScale(i))
+       .attr("y", yScale(d.average))
+       .attr("width", 50)
+       .attr("height", 30)
+       .attr("fill", "white")
+
+
+       plotLand.append("text")
+       .attr("id", "tooltip")
+       .attr("x", xScale(i)+15)
+       .attr("y", yScale(d.average)+15)
+       .attr("tet-anchor", "middle")
+       .attr("fill", "black")
+       .text(parseInt(d.average))
+     })
+      .on("mouseout", function()
+    {d3.select("#tooltip").remove();
+    d3.select("rect").remove()})
+
+
 
 
 //make the images update the chart everytime the user hovers over it
@@ -235,8 +268,12 @@ var images =
             d3.selectAll(".individual_line")
             .attr("stroke", "none")
 
+
              name = parseInt(this.name);
-             updateChart(data,gradesByDays,listDays,plotLand,name,xScale,yScale);
+             svg.attr("transform", "scale(0.5)")
+            updateChart(data,gradesByDays,listDays,plotLand,name,xScale,yScale)
+            ;
+
            })
            .on('mouseout', function(){
              console.log("here")
@@ -244,10 +281,12 @@ var images =
                 .attr("stroke", "none")
            })//location.reload());
           .on("click", function()
-        {d3.select("this")
+          {d3.select("this")
           .attr("transform", "scale(5)")
           d3.selectAll(".line")
             .attr("stroke", "none")
+            d3.selectAll("circle")
+            .attr("fill", "none")
           penguin=parseInt(this.name)
         fourLines(data, penguin, plotLand, xScale, yScale, height, width)})
 
@@ -434,6 +473,8 @@ plotLand.append('path')
         .attr("fill", "none")
         .attr("stroke", "blue")
         .attr("stroke-width", 2);
+
+
 }
 
 var fourLines= function(data, penguin, plotLand, xScale, yScale, height, width)
@@ -503,6 +544,8 @@ final.forEach(function(d){
           .attr("stroke", "hotpink")
           .attr("stroke-width", 2)
 
+
+
           var testLine=d3.line()
           .x(function(d){
               return xScale(parseInt(d.day))})
@@ -532,4 +575,30 @@ final.forEach(function(d){
                   .attr('class','individual_line')
                   .attr('d',finalLine)
                   .attr("fill", "none")
-                  .attr("stroke", "green")}
+                  .attr("stroke", "green")
+
+var barChart= d3.select("#barChart")
+                .attr('width',1200)
+                .attr('height',1000);
+var plotBar = barChart.append('g')
+                      .classed('plot',true)
+                      .attr('width',300)
+                      .attr('height',390)
+                      .attr("transform","translate(70,10)");
+var xAxis2=d3.axisBottom(xScale)
+barChart.append("g")
+.classed("xAxis", true)
+.call(xAxis2)
+.attr("transform", "translate(70,530)")
+
+var yAxis2=d3.axisLeft(yScale)
+barChart.append("g")
+.classed("yAxis", true)
+.call(yAxis2)
+.attr("transform", "translate(70,0)")
+
+
+
+
+
+                }
