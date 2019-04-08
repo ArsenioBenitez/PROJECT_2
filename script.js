@@ -301,3 +301,31 @@ console.log(data)
 }
 
 };
+
+//old bar chart code
+var vals = []
+var diff = function(studentAveragesByDay)
+{
+
+  studentAveragesByDay.forEach(function(d,i)
+  {
+
+   if((averagesByDay[i].day+1)==d.day)
+   {
+
+     var calc = Math.abs(d.average-averagesByDay[i].average);
+     var grade = {
+       difference: calc,
+       day: d.day
+     }
+
+     vals.push(grade)
+
+   }
+
+
+  })
+
+}
+diff(studentAveragesByDay);
+console.log(vals);

@@ -14,6 +14,8 @@ function(err)
 //////////////////
 var drawChart = function(data)
 {
+  document.getElementById("heading")
+          .innerHTML="Average Grades Per Day"
 ////Step 1: get data
   var allGrades = [];//this will contain all of the grade objects
   var getHw = data[0].homework.forEach(function(d,i)
@@ -159,7 +161,7 @@ var drawChart = function(data)
 var screen =
 {
   width: 1200,
-  height: 500
+  height: 400
 }
 
 var margins =
@@ -204,11 +206,11 @@ var plotLand = svg.append('g')
 //make axis labels
 var yLabel =svg.append('text')
             .attr('transform','rotate(-90)')
-            .attr('y',0+margins.left-50)
-            .attr('x',0-(height/2))
+            .attr('y',0+margins.left-40)
+            .attr('x',0-(height/1.5))
             .text('Average Grade');
 var xLabel =svg.append("text")
-            .attr('transform','translate('+(width+margins.left)/2 + ','+(xA+30)+')' )
+            .attr('transform','translate('+(width+margins.left)/1.85 + ','+(xA+40)+')' )
             .text('Day');
 svg.select('div.students')
     .attr('y',height+30);
@@ -218,7 +220,7 @@ var drawLine = d3.line()
                  return xScale(d.day)})
                .y(function(d){return yScale(d.average)})
                //.curve(d3.curveCardinal);
-console.log(averagesByDay, "averagesByDay")
+
 plotLand.append('path')
      .datum(averagesByDay)
      .transition().duration(10)
@@ -239,29 +241,27 @@ plotLand.append('path')
      .attr("fill", "red")
 
      .on("mouseover", function(d, i){
-       d3.selectAll("rect").remove()
-       plotLand.append("rect")
-       .attr("class", "tooltip")
-       .attr("x", xScale(i))
-       .attr("y", yScale(d.average))
-       .attr("width", 50)
-       .attr("height", 30)
-       .attr("fill", "white")
+       // d3.selectAll("rect").remove()
+       // plotLand.append("rect")
+       // .attr("class", "tooltip")
+       // .attr("x", xScale(i))
+       // .attr("y", yScale(d.average))
+       // .attr("width", 50)
+       // .attr("height", 30)
+       // .attr("fill", "white")
 
        plotLand.append("text")
        .attr("class", "tooltip")
        .attr("x", xScale(i)+15)
-       .attr("y", yScale(d.average)+15)
+       .attr("y", yScale(d.average)-20)
        .attr("tet-anchor", "middle")
        .attr("fill", "black")
-       .text(parseInt(d.average))
+       .text("Day: "+(d.day)+" Class Average: "+(parseInt(d.average)))
      })
       .on("mouseout", function()
     {d3.select(".tooltip").remove();
-    //d3.selectAll("rect").remove();
-    d3.select("#barChart")
-      .select("rect")
-      .remove()
+
+
 
   })
 
@@ -273,6 +273,9 @@ var images =
          d3.selectAll('img')
           .on('mouseover',function()
           {
+            document.getElementById("heading")
+                    .innerHTML="Average Grades Per Day"
+
             d3.selectAll(".individual_line")
             .attr("stroke", "none")
 
@@ -280,21 +283,20 @@ var images =
             .attr("class", "small")
 
 
+
+
              name = parseInt(this.name);
-             svg.attr("transform", "scale(0.5) translate(-500,-120)" )
+
             updateChart(data,gradesByDays,listDays,plotLand,name,xScale,yScale, averagesByDay)
             ;
 
            })
            .on('mouseout', function(){
-             svg.attr("transform", "scale(1) translate(0,0)" )
-            d3.selectAll("#barChartAxis")
-              .style("opacity", "0")
+
 
              d3.selectAll("#studentAvg")
                 .attr("stroke", "none")
-              d3.selectAll("rect")
-                .attr("fill", "none")
+
            })//location.reload());
           .on("click", function()
           {d3.select("this")
@@ -312,7 +314,7 @@ var legend = svg.append('g')
                   .classed('legend',true)
                   .attr('transform','translate('+(width+margins.left)+','+margins.top+')');
 var legendLines = legend.selectAll('g')
-                        .data([0,1, 2, 3, 4])
+                        .data([0,1])
                         .enter()
                         .append('g')
                         .classed('legendLines',true)
@@ -322,9 +324,9 @@ var legendLines = legend.selectAll('g')
                         })
 legendLines.append('rect')
            .attr('x',0)
-           .attr('y',10)
-           .attr('width',10)
-           .attr('height',10)
+           .attr('y',function(d,i){return 10*i})
+           .attr('width',12)
+           .attr('height',12)
            .attr('fill',function(d,i)
            {
             if(i==0)
@@ -335,18 +337,19 @@ legendLines.append('rect')
             {
               return "blue";
             }
-            else if (i==2)
-            {return "pink"}
 
-            else if(i=3)
-            {return "purple"}
-
-            else
-            {return "green"}
+            // else if (i==2)
+            // {return "pink"}
+            //
+            // else if(i=3)
+            // {return "purple"}
+            //
+            // else
+            // {return "green"}
           })
 legendLines.append('text')
-           .attr('x',10)
-           .attr('y',20)
+           .attr('x',15)
+           .attr('y',function(d,i){return (10*i)+12})
            .text(function(d,i)
            {
             if(i==0)
@@ -357,14 +360,14 @@ legendLines.append('text')
             {
               return "Student Average By Day";
             }
-            else if (i==2)
-            {return "Student Homework Grades"}
-
-            else if(i=3)
-            {return "Student Quiz Grades"}
-
-            else
-            {return "Student Test Grades"}
+            // else if (i==2)
+            // {return "Student Homework Grades"}
+            //
+            // else if(i=3)
+            // {return "Student Quiz Grades"}
+            //
+            // else
+            // {return "Student Test Grades"}
                               })
 }
 
@@ -511,74 +514,14 @@ plotLand.append('path')
                   .domain([0,41])
                   .range([0,width])
 
-        var barChart= d3.select("#barChart")
-                        .attr('width',width+margins.left+margins.right)
-                        .attr('height',height+margins.top+margins.bottom);
-        var plotBar = barChart.append('g')
-                              .classed('plot',true)
-                              .attr('width',width)
-                              .attr('height',height)
-                              .attr("transform", "translate("+margins.left+","+(margins.top+margins.bottom)+")")
 
 
-        var vals = []
-        var diff = function(studentAveragesByDay)
-        {
-
-          studentAveragesByDay.forEach(function(d,i)
-          {
-
-           if((averagesByDay[i].day+1)==d.day)
-           {
-
-             var calc = Math.abs(d.average-averagesByDay[i].average);
-             var grade = {
-               difference: calc,
-               day: d.day
-             }
-
-             vals.push(grade)
-
-           }
 
 
-          })
-
-        }
-        diff(studentAveragesByDay);
-        console.log(vals);
-
-        var xAxis2=d3.axisBottom(xScale)
-        barChart.append("g")
-        .attr("id", "barChartAxis")
-        .classed("xAxis", true)
-        .call(xAxis2)
-        .attr("transform", "translate("+margins.left+","+(height-10)+")")
 
 
-        var yAxis2=d3.axisLeft(yScale)
-        barChart.append("g")
-        .attr("id", "barChartAxis")
-        .classed("yAxis", true)
-        .call(yAxis2)
-        .attr("transform", "translate("+margins.left+","+margins.top+")")
 
 
-      plotBar.selectAll("rect")
-        .data(vals)
-        .enter()
-        .append("rect")
-        .attr("x", function(d,i){
-          return barWidth*i
-        })
-        .attr("height", function(d,i)
-        {return yScale(d.difference) })
-        .attr('width',barWidth)
-        .attr('y',function(d,i)
-      {
-        return height-yScale(d.difference);
-      })
-      .attr('fill','red');
 
 
 
@@ -586,7 +529,14 @@ plotLand.append('path')
 }
 
 var fourLines= function(data, penguin, plotLand, xScale, yScale, height, width)
-{data[penguin].quizes.forEach(function(d){d.type="Quiz"});
+{
+
+  document.getElementById("heading")
+          .innerHTML="Individual Penguin's Grades"
+
+    d3.selectAll(".legend").remove()
+//received help manipulating this data from Kristin D. and Daniel B.
+data[penguin].quizes.forEach(function(d){d.type="Quiz"});
 data[penguin].homework.forEach(function(d){d.type="Homework"});
 data[penguin].final.forEach(function(d){d.type="Final"});
 data[penguin].test.forEach(function(d){d.type="Test"});
@@ -634,8 +584,6 @@ final.forEach(function(d){
       .attr("stroke-width", 2)
 
 
-
-
       var homeworkLine=d3.line()
       .x(function(d){
           return xScale(parseInt(d.day))})
@@ -677,17 +625,50 @@ final.forEach(function(d){
                 return yScale(d.finalPercent)})
               .curve(d3.curveCardinal)
 
-                plotLand.append('path')
-                  .datum(final)
-                  .transition().duration(1000)
-                  .attr('class','individual_line')
-                  .attr('d',finalLine)
-                  .attr("fill", "none")
-                  .attr("stroke", "green")
+              var legend = svg.append('g')
+                                .classed('legend2',true)
+                                .attr('transform','translate('+(width+margins.left)+','+margins.top+')');
+              var legendLines = legend.selectAll('g')
+                                      .data([0,1,2])
+                                      .enter()
+                                      .append('g')
+                                      .classed('legendLines',true)
+                                      .attr('transform', function(d,i)
+                                      {
+                                        return "translate(0,"+(i*12)+")";
+                                      })
+              legendLines.append('rect')
+                         .attr('x',0)
+                         .attr('y',10)
+                         .attr('width',10)
+                         .attr('height',10)
+                         .attr('fill',function(d,i)
+                         {
 
+                          if (i==0)
+                          {return "pink"}
 
+                          else if(i==1)
+                          {return "purple"}
 
+                          else
+                          {return "green"}
+                        })
+              legendLines.append('text')
+                         .attr('x',10)
+                         .attr('y',20)
+                         .text(function(d,i)
+                         {
 
+                          if (i==0)
+                          {return "Student Homework Grades"}
+
+                          else if(i==1)
+                          {return "Student Quiz Grades"}
+
+                          else
+                          {return "Student Test Grades"}
+                        })
 
 
 
