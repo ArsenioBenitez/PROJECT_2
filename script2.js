@@ -138,7 +138,7 @@ var drawChart = function(data)
       else if(i==40)
       {avg=fl_total/23}
 
-      else if (i%2==i&&i!=29)
+      else if (i%2==1&&i!=29)
       {avg=((hw_total+qz_total)/2)/23}
 
       else{avg=qz_total/23}
@@ -150,8 +150,9 @@ var drawChart = function(data)
     var classAv =
     {
       average: avg,
-      day: i
+      day: i+1
     }
+    console.log(classAv, "classAv")
     averagesByDay.push(classAv);
   });
 //make the screen
@@ -214,9 +215,10 @@ svg.select('div.students')
 //make line
 var drawLine = d3.line()
                .x(function(d,i){
-                 return xScale(i)})
+                 return xScale(d.day)})
                .y(function(d){return yScale(d.average)})
-               .curve(d3.curveCardinal);
+               //.curve(d3.curveCardinal);
+console.log(averagesByDay, "averagesByDay")
 plotLand.append('path')
      .datum(averagesByDay)
      .transition().duration(10)
@@ -231,7 +233,7 @@ plotLand.append('path')
     .enter()
     .append("circle")
      .attr("class", "dot")
-     .attr("cx", function(d,i){return xScale(i)})
+     .attr("cx", function(d,i){return xScale(d.day)})
      .attr("cy", function(d){return yScale(d.average)} )
      .attr("r", 5)
      .attr("fill", "red")
@@ -239,6 +241,7 @@ plotLand.append('path')
      .on("mouseover", function(d, i){
        d3.selectAll("rect").remove()
        plotLand.append("rect")
+       .attr("class", "tooltip")
        .attr("x", xScale(i))
        .attr("y", yScale(d.average))
        .attr("width", 50)
@@ -246,7 +249,7 @@ plotLand.append('path')
        .attr("fill", "white")
 
        plotLand.append("text")
-       .attr("id", "tooltip")
+       .attr("class", "tooltip")
        .attr("x", xScale(i)+15)
        .attr("y", yScale(d.average)+15)
        .attr("tet-anchor", "middle")
@@ -254,7 +257,7 @@ plotLand.append('path')
        .text(parseInt(d.average))
      })
       .on("mouseout", function()
-    {d3.select("#tooltip").remove();
+    {d3.select(".tooltip").remove();
     //d3.selectAll("rect").remove();
     d3.select("#barChart")
       .select("rect")
@@ -476,7 +479,7 @@ var drawLine = d3.line()
                   .x(function(d,i){
                     return xScale(d.day)})
                     .y(function(d){return yScale(d.average)})
-                    .curve(d3.curveCardinal);
+                    //.curve(d3.curveCardinal);
 plotLand.append('path')
         .datum(studentAveragesByDay)
         .transition().duration(10)
@@ -502,22 +505,48 @@ plotLand.append('path')
         var yScale=d3.scaleLinear()
                     .domain([0,100])
                              //.domain([0,d3.max(hw, function(d){return d.day;})])
-                    .range([height-margins.top, 0]);
+                    .range([height, 0]);
 
         var xScale=d3.scaleLinear()
                   .domain([0,41])
-                  .range([0,width-margins.left])
+                  .range([0,width])
 
         var barChart= d3.select("#barChart")
-                        .attr('width',width)
-                        .attr('height',height);
+                        .attr('width',width+margins.left+margins.right)
+                        .attr('height',height+margins.top+margins.bottom);
         var plotBar = barChart.append('g')
                               .classed('plot',true)
-                              .attr('width',width-margins.left-margins.right)
-                              .attr('height',height-margins.top)
+                              .attr('width',width)
+                              .attr('height',height)
                               .attr("transform", "translate("+margins.left+","+(margins.top+margins.bottom)+")")
 
 
+        var vals = []
+        var diff = function(studentAveragesByDay)
+        {
+
+          studentAveragesByDay.forEach(function(d,i)
+          {
+
+           if((averagesByDay[i].day+1)==d.day)
+           {
+
+             var calc = Math.abs(d.average-averagesByDay[i].average);
+             var grade = {
+               difference: calc,
+               day: d.day
+             }
+
+             vals.push(grade)
+
+           }
+
+
+          })
+
+        }
+        diff(studentAveragesByDay);
+        console.log(vals);
 
         var xAxis2=d3.axisBottom(xScale)
         barChart.append("g")
@@ -536,33 +565,20 @@ plotLand.append('path')
 
 
       plotBar.selectAll("rect")
-        .data(studentAveragesByDay)
+        .data(vals)
         .enter()
         .append("rect")
         .attr("x", function(d,i){
           return barWidth*i
         })
-        .attr("y", function(d,i){
-          return Math.abs(yScale(d.average-(averagesByDay[i].average)))-margins.top-margins.bottom
-        })
-        .attr("width", barWidth)
-        .attr("height", function(d,i){
-          if(d.day == i+1)
-          {
-          var value=Math.abs(yScale(d.average-(averagesByDay[i].average)))
-
-          console.log(height-Math.abs(yScale(d.average-(averagesByDay[i].average))), "pixels")
-          console.log(d.average,'student average')
-          console.log(i, "day")
-        console.log(averagesByDay[i].average,'class average')
-          return height-value
-        }})
-        .attr("fill", function(d,i){
-          if (d.average>averagesByDay[i].average)
-          {return "blue"}
-          else{return "red"}
-
-        })
+        .attr("height", function(d,i)
+        {return yScale(d.difference) })
+        .attr('width',barWidth)
+        .attr('y',function(d,i)
+      {
+        return height-yScale(d.difference);
+      })
+      .attr('fill','red');
 
 
 
