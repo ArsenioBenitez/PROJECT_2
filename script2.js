@@ -100,7 +100,7 @@ var drawChart = function(data)
   })
   //calculate class averages: we now have all the grades by day so we can use that to calculate a moving
   //average for the class
-  console.log(gradesByDays)
+
   var averagesByDay = []
   gradesByDays.forEach(function(d,i)
   {
@@ -237,13 +237,13 @@ plotLand.append('path')
      .attr("fill", "red")
 
      .on("mouseover", function(d, i){
+       d3.selectAll("rect").remove()
        plotLand.append("rect")
        .attr("x", xScale(i))
        .attr("y", yScale(d.average))
        .attr("width", 50)
        .attr("height", 30)
        .attr("fill", "white")
-
 
        plotLand.append("text")
        .attr("id", "tooltip")
@@ -255,7 +255,12 @@ plotLand.append('path')
      })
       .on("mouseout", function()
     {d3.select("#tooltip").remove();
-    d3.select("rect").remove()})
+    //d3.selectAll("rect").remove();
+    d3.select("#barChart")
+      .select("rect")
+      .remove()
+
+  })
 
 
 
@@ -268,17 +273,25 @@ var images =
             d3.selectAll(".individual_line")
             .attr("stroke", "none")
 
+            d3.select("#lineChart")
+            .attr("class", "small")
+
 
              name = parseInt(this.name);
-             svg.attr("transform", "scale(0.5)")
-            updateChart(data,gradesByDays,listDays,plotLand,name,xScale,yScale)
+             svg.attr("transform", "scale(0.5) translate(-200,0)" )
+            updateChart(data,gradesByDays,listDays,plotLand,name,xScale,yScale, averagesByDay)
             ;
 
            })
            .on('mouseout', function(){
-             console.log("here")
+             svg.attr("transform", "scale(1) translate(200,0)" )
+            d3.selectAll("#barChartAxis")
+              .style("opacity", "0")
+
              d3.selectAll("#studentAvg")
                 .attr("stroke", "none")
+              d3.selectAll("rect")
+                .attr("fill", "none")
            })//location.reload());
           .on("click", function()
           {d3.select("this")
@@ -363,7 +376,7 @@ legendLines.append('text')
 
 
 
-var updateChart = function(data,gradesByDays,listDays,plotLand,name,xScale,yScale)
+var updateChart = function(data,gradesByDays,listDays,plotLand,name,xScale,yScale, averagesByDay)
 {
   // d3.select("#studentAvg")
   //    .attr("stroke", "none")
@@ -455,7 +468,7 @@ listDays.forEach(function(d)
     day: i+1
   }
   studentAveragesByDay.push(individualAv);
-  console.log(studentAveragesByDay);
+
   })
 
 
@@ -474,6 +487,95 @@ plotLand.append('path')
         .attr("stroke", "blue")
         .attr("stroke-width", 2);
 
+        var width=300
+        var height=300
+        var barWidth=width/41
+
+        var margins =
+        {
+          top:50,
+          bottom:50,
+          left:100,
+          right:50
+        }
+
+        var yScale=d3.scaleLinear()
+                    .domain([0,100])
+                             //.domain([0,d3.max(hw, function(d){return d.day;})])
+                    .range([height-margins.top-margins.bottom,0]);
+
+        var xScale=d3.scaleLinear()
+                  .domain([0,41])
+                  .range([0,width])
+
+        var barChart= d3.select("#barChart")
+                        .attr('width',width)
+                        .attr('height',height);
+        var plotBar = barChart.append('g')
+                              .classed('plot',true)
+                              .attr('width',width-margins.left-margins.right)
+                              .attr('height',height-margins.top-margins.bottom)
+                              .attr("transform", "translate("+margins.left+","+margins.top+")")
+
+
+
+        var xAxis2=d3.axisBottom(xScale)
+        barChart.append("g")
+        .attr("id", "barChartAxis")
+        .classed("xAxis", true)
+        .call(xAxis2)
+        .attr("transform", "translate("+margins.left+","+(height-margins.bottom)+")")
+
+
+        var yAxis2=d3.axisLeft(yScale)
+        barChart.append("g")
+        .attr("id", "barChartAxis")
+        .classed("yAxis", true)
+        .call(yAxis2)
+        .attr("transform", "translate("+margins.left+","+margins.top+")")
+
+
+      plotBar.selectAll("rect")
+        .data(studentAveragesByDay)
+        .enter()
+        .append("rect")
+        .attr("x", function(d,i){
+          return barWidth*i
+        })
+        .attr("y", function(d,i){
+          return Math.abs(yScale(d.average-(averagesByDay[i].average)))-margins.top-margins.bottom
+        })
+        .attr("width", barWidth)
+        .attr("height", function(d,i){
+          var value=Math.abs(yScale(d.average-(averagesByDay[i].average)))
+
+          console.log(height-Math.abs(yScale(d.average-(averagesByDay[i].average))))
+          //console.log(d.average,'student average')
+        //  console.log(averagesByDay[i].average,'class average')
+          return height-Math.abs(yScale(d.average-(averagesByDay[i].average)))
+        })
+        .attr("fill", function(d,i){
+          if (d.average>averagesByDay[i].average)
+          {return "blue"}
+          else{return "red"}
+
+        })
+
+
+
+        //  .attr("y", function(d, i){
+        //    return 300-yScale(d.average-(averagesByDay[i].average))
+        // })
+        // .attr("x", function(d, i){return xScale(i)+80})
+        // .attr("height", //yScale(10))
+        // function(d,i){
+        //   console.log(averagesByDay[i].average, "averagesbyday[i].average")
+        //   console.log(d.average, "d.grade")
+        //   console.log(d.average-(averagesByDay[i].average))
+        //   console.log(yScale(d.average-(averagesByDay[i].average)))
+        // return yScale(d.average-(averagesByDay[i].average))})
+        // .attr("width", 300/41)
+        // .attr("fill", "blue")
 
 }
 
@@ -577,25 +679,7 @@ final.forEach(function(d){
                   .attr("fill", "none")
                   .attr("stroke", "green")
 
-var barChart= d3.select("#barChart")
-                .attr('width',1200)
-                .attr('height',1000);
-var plotBar = barChart.append('g')
-                      .classed('plot',true)
-                      .attr('width',300)
-                      .attr('height',390)
-                      .attr("transform","translate(70,10)");
-var xAxis2=d3.axisBottom(xScale)
-barChart.append("g")
-.classed("xAxis", true)
-.call(xAxis2)
-.attr("transform", "translate(70,530)")
 
-var yAxis2=d3.axisLeft(yScale)
-barChart.append("g")
-.classed("yAxis", true)
-.call(yAxis2)
-.attr("transform", "translate(70,0)")
 
 
 

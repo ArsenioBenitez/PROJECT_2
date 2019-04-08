@@ -1,10 +1,8 @@
 
 body{
-  background-color: LightYellow;
+  background-color: "#d8edf3";
 }
-svg{
-  float:left;
-}
+
 div.nav{
   float:right;
 }
@@ -23,4 +21,32 @@ img:hover {
 
 .hidden{
   opacity:0;
+}
+#lineChart{
+  float:left;
+}
+
+#barChart{
+  float:right
+}
+#lineChartDiv{
+  position:fixed;
+  width:500px;
+  top:-50px;
+  left:-200px;
+}
+
+#imagesDiv{
+position:fixed;
+top:500px;
+left:0;
+
+}
+
+#barChartDiv{
+  position:fixed;
+  height:300px;
+  width:300px;
+  left:600px;
+  top:20px;
 }
