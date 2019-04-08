@@ -278,13 +278,13 @@ var images =
 
 
              name = parseInt(this.name);
-             svg.attr("transform", "scale(0.5) translate(-200,0)" )
+             svg.attr("transform", "scale(0.5) translate(-500,-120)" )
             updateChart(data,gradesByDays,listDays,plotLand,name,xScale,yScale, averagesByDay)
             ;
 
            })
            .on('mouseout', function(){
-             svg.attr("transform", "scale(1) translate(200,0)" )
+             svg.attr("transform", "scale(1) translate(0,0)" )
             d3.selectAll("#barChartAxis")
               .style("opacity", "0")
 
@@ -506,7 +506,7 @@ plotLand.append('path')
 
         var xScale=d3.scaleLinear()
                   .domain([0,41])
-                  .range([0,width])
+                  .range([0,width-margins.left])
 
         var barChart= d3.select("#barChart")
                         .attr('width',width)
