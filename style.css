@@ -8,9 +8,12 @@ body{
 }
 
 h1{
-  font-size:30px;
-  text-align: center;
+  position:fixed;
   top:5px;
+  left:430px;
+  font-size:30px;
+
+
 }
 
 .yAxis{
@@ -46,9 +49,9 @@ img:hover {
 
 #informationDiv{
   position:fixed;
-  left:1050px;
+  left:1030px;
   top:175px;
-  width:200px;
+  width:225px;
   height:200px;
 }
 

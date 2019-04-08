@@ -210,7 +210,7 @@ var yLabel =svg.append('text')
             .attr('x',0-(height/1.5))
             .text('Average Grade');
 var xLabel =svg.append("text")
-            .attr('transform','translate('+(width+margins.left)/1.85 + ','+(xA+40)+')' )
+            .attr('transform','translate('+(width+margins.left)/1.88 + ','+(xA+35)+')' )
             .text('Day');
 svg.select('div.students')
     .attr('y',height+30);
