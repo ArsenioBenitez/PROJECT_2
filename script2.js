@@ -494,7 +494,7 @@ plotLand.append('path')
         var margins =
         {
           top:50,
-          bottom:50,
+          bottom:100,
           left:100,
           right:50
         }
@@ -502,7 +502,7 @@ plotLand.append('path')
         var yScale=d3.scaleLinear()
                     .domain([0,100])
                              //.domain([0,d3.max(hw, function(d){return d.day;})])
-                    .range([height-margins.top-margins.bottom,0]);
+                    .range([height-margins.top, 0]);
 
         var xScale=d3.scaleLinear()
                   .domain([0,41])
@@ -514,8 +514,8 @@ plotLand.append('path')
         var plotBar = barChart.append('g')
                               .classed('plot',true)
                               .attr('width',width-margins.left-margins.right)
-                              .attr('height',height-margins.top-margins.bottom)
-                              .attr("transform", "translate("+margins.left+","+margins.top+")")
+                              .attr('height',height-margins.top)
+                              .attr("transform", "translate("+margins.left+","+(margins.top+margins.bottom)+")")
 
 
 
@@ -524,7 +524,7 @@ plotLand.append('path')
         .attr("id", "barChartAxis")
         .classed("xAxis", true)
         .call(xAxis2)
-        .attr("transform", "translate("+margins.left+","+(height-margins.bottom)+")")
+        .attr("transform", "translate("+margins.left+","+(height-10)+")")
 
 
         var yAxis2=d3.axisLeft(yScale)
@@ -547,13 +547,16 @@ plotLand.append('path')
         })
         .attr("width", barWidth)
         .attr("height", function(d,i){
+          if(d.day == i+1)
+          {
           var value=Math.abs(yScale(d.average-(averagesByDay[i].average)))
 
-          console.log(height-Math.abs(yScale(d.average-(averagesByDay[i].average))))
-          //console.log(d.average,'student average')
-        //  console.log(averagesByDay[i].average,'class average')
-          return height-Math.abs(yScale(d.average-(averagesByDay[i].average)))
-        })
+          console.log(height-Math.abs(yScale(d.average-(averagesByDay[i].average))), "pixels")
+          console.log(d.average,'student average')
+          console.log(i, "day")
+        console.log(averagesByDay[i].average,'class average')
+          return height-value
+        }})
         .attr("fill", function(d,i){
           if (d.average>averagesByDay[i].average)
           {return "blue"}
@@ -563,19 +566,6 @@ plotLand.append('path')
 
 
 
-        //  .attr("y", function(d, i){
-        //    return 300-yScale(d.average-(averagesByDay[i].average))
-        // })
-        // .attr("x", function(d, i){return xScale(i)+80})
-        // .attr("height", //yScale(10))
-        // function(d,i){
-        //   console.log(averagesByDay[i].average, "averagesbyday[i].average")
-        //   console.log(d.average, "d.grade")
-        //   console.log(d.average-(averagesByDay[i].average))
-        //   console.log(yScale(d.average-(averagesByDay[i].average)))
-        // return yScale(d.average-(averagesByDay[i].average))})
-        // .attr("width", 300/41)
-        // .attr("fill", "blue")
 
 }
 
