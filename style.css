@@ -15,6 +15,9 @@ h1{
 
 
 }
+.hidden{
+  display:none
+}
 
 .yAxis{
   font-family: 'Oswald', sans-serif;
@@ -50,7 +53,7 @@ img:hover {
 #informationDiv{
   position:fixed;
   left:1030px;
-  top:175px;
+  top:180px;
   width:225px;
   height:200px;
 }

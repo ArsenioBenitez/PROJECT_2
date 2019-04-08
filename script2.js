@@ -256,7 +256,7 @@ plotLand.append('path')
        .attr("y", yScale(d.average)-20)
        .attr("tet-anchor", "middle")
        .attr("fill", "black")
-       .text("Day: "+(d.day)+" Class Average: "+(parseInt(d.average)))
+       .text("Day: "+(d.day)+", Class Average: "+(parseInt(d.average)))
      })
       .on("mouseout", function()
     {d3.select(".tooltip").remove();
@@ -299,14 +299,15 @@ var images =
 
            })//location.reload());
           .on("click", function()
-          {d3.select("this")
-          .attr("transform", "scale(5)")
+          {d3.select("#imagesDiv")
+            .classed("hidden", true)
+          legend.classed("hidden", true)
           d3.selectAll(".line")
             .attr("stroke", "none")
             d3.selectAll("circle")
             .attr("fill", "none")
           penguin=parseInt(this.name)
-        fourLines(data, penguin, plotLand, xScale, yScale, height, width)})
+        fourLines(data, penguin, plotLand, xScale, yScale, height, width, svg, margins)})
 
 
 //set up legend
@@ -338,6 +339,7 @@ legendLines.append('rect')
               return "blue";
             }
 
+
             // else if (i==2)
             // {return "pink"}
             //
@@ -348,6 +350,7 @@ legendLines.append('rect')
             // {return "green"}
           })
 legendLines.append('text')
+          .attr("id", "legendText")
            .attr('x',15)
            .attr('y',function(d,i){return (10*i)+12})
            .text(function(d,i)
@@ -360,15 +363,24 @@ legendLines.append('text')
             {
               return "Student Average By Day";
             }
-            // else if (i==2)
-            // {return "Student Homework Grades"}
-            //
-            // else if(i=3)
-            // {return "Student Quiz Grades"}
-            //
-            // else
-            // {return "Student Test Grades"}
-                              })
+
+          })
+            .attr('id',function(d,i)
+          {
+
+             if(i==0)
+             {
+               return "line1";
+             }
+             else if (i==1)
+             {
+               return "line2";
+             }
+             else if(i==2)
+           {
+             return "line3"}
+          })
+
 }
 
 
@@ -528,13 +540,48 @@ plotLand.append('path')
 
 }
 
-var fourLines= function(data, penguin, plotLand, xScale, yScale, height, width)
+var fourLines= function(data, penguin, plotLand, xScale, yScale, height, width, svg, margins)
 {
-
+  console.log('fourlines')
+  var pic = data[penguin].picture.split('-')
   document.getElementById("heading")
-          .innerHTML="Individual Penguin's Grades"
+          .innerHTML=pic[0]+" Penguin's Grades"
 
-    d3.selectAll(".legend").remove()
+    d3.selectAll(".legend")
+    .selectAll('rect')
+    .data([0,1,2])
+    .attr("fill",function(d,i){
+      if (i==0)
+      {return "hotpink"}
+      else if(i==1)
+      {return "purple"}
+      else if(i==2)
+      {return "green"}
+    })
+    d3.selectAll('.legend')
+    .selectAll('rect')
+
+    .data([0,1,2])
+    .select('text', function(d,i){
+      if (i==0)
+      {return "Homework"}
+      if (i==1)
+      {return "Quiz"}
+      if (i==2)
+      {return "Test"}
+    })
+    .attr('x',15)
+    .attr('y',function(d,i){return (10*i)+12})
+
+
+
+    // d3.selectAll("rect")
+    // .selectAll("#legendText")
+    // .data([0,1,2])
+
+
+
+
 //received help manipulating this data from Kristin D. and Daniel B.
 data[penguin].quizes.forEach(function(d){d.type="Quiz"});
 data[penguin].homework.forEach(function(d){d.type="Homework"});
@@ -625,50 +672,65 @@ final.forEach(function(d){
                 return yScale(d.finalPercent)})
               .curve(d3.curveCardinal)
 
-              var legend = svg.append('g')
-                                .classed('legend2',true)
-                                .attr('transform','translate('+(width+margins.left)+','+margins.top+')');
-              var legendLines = legend.selectAll('g')
-                                      .data([0,1,2])
-                                      .enter()
-                                      .append('g')
-                                      .classed('legendLines',true)
-                                      .attr('transform', function(d,i)
-                                      {
-                                        return "translate(0,"+(i*12)+")";
+var button = d3.select('button#backButton')
+              .classed("hidden", false)
+              .on('click',function()
+              {
+              return location.reload()})
+
+var legend2 = svg.append('g')
+                  .classed('legend',true)
+                  .attr('transform','translate('+(width+margins.left)+','+margins.top+')');
+var legendLines = legend2.selectAll('g')
+                          .data([0,1,2])
+                          .enter()
+                          .append('g')
+                          .classed('legendLines',true)
+                          .attr('transform', function(d,i)
+                              {
+                              return "translate(0,"+(i*12)+")";
                                       })
               legendLines.append('rect')
                          .attr('x',0)
-                         .attr('y',10)
-                         .attr('width',10)
-                         .attr('height',10)
+                         .attr('y',function(d,i){return 10*i})
+                         .attr('width',12)
+                         .attr('height',12)
                          .attr('fill',function(d,i)
                          {
-
-                          if (i==0)
-                          {return "pink"}
-
+                          if(i==0)
+                          {
+                            return "hotpink";
+                          }
                           else if(i==1)
-                          {return "purple"}
-
-                          else
+                          {
+                            return "purple";
+                          }
+                          else if(i==2)
                           {return "green"}
+
+
+
                         })
               legendLines.append('text')
-                         .attr('x',10)
-                         .attr('y',20)
+                        .attr("id", "legendText")
+                         .attr('x',15)
+                         .attr('y',function(d,i){return (10*i)+12})
                          .text(function(d,i)
                          {
+                          if(i==0)
+                          {
+                            return "Homework";
+                          }
+                          else if (i==1)
+                          {
+                            return "Quizzes";
+                          }
+                          else if(i==2)
+                          {return "Tests"}
 
-                          if (i==0)
-                          {return "Student Homework Grades"}
-
-                          else if(i==1)
-                          {return "Student Quiz Grades"}
-
-                          else
-                          {return "Student Test Grades"}
                         })
+
+
 
 
 
