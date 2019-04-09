@@ -10,8 +10,7 @@ function(err)
 {
   console.log(err);
 });
-//////////////////
-//////////////////
+
 var drawChart = function(data)
 {
   document.getElementById("heading")
@@ -154,7 +153,7 @@ var drawChart = function(data)
       average: avg,
       day: i+1
     }
-    console.log(classAv, "classAv")
+
     averagesByDay.push(classAv);
   });
 //make the screen
@@ -181,7 +180,6 @@ var svg = d3.select('#lineChart')
 
 var xScale=d3.scaleLinear()
             .domain([0,41])
-                     //.domain([0,d3.max(hw, function(d){return d.day;})])
             .range([0, width]);
 var yScale=d3.scaleLinear()
             .domain([0,100])
@@ -241,14 +239,6 @@ plotLand.append('path')
      .attr("fill", "red")
 
      .on("mouseover", function(d, i){
-       // d3.selectAll("rect").remove()
-       // plotLand.append("rect")
-       // .attr("class", "tooltip")
-       // .attr("x", xScale(i))
-       // .attr("y", yScale(d.average))
-       // .attr("width", 50)
-       // .attr("height", 30)
-       // .attr("fill", "white")
 
        plotLand.append("text")
        .attr("class", "tooltip")
@@ -260,9 +250,6 @@ plotLand.append('path')
      })
       .on("mouseout", function()
     {d3.select(".tooltip").remove();
-
-
-
   })
 
 
@@ -281,9 +268,6 @@ var images =
 
             d3.select("#lineChart")
             .attr("class", "small")
-
-
-
 
              name = parseInt(this.name);
 
@@ -339,15 +323,6 @@ legendLines.append('rect')
               return "blue";
             }
 
-
-            // else if (i==2)
-            // {return "pink"}
-            //
-            // else if(i=3)
-            // {return "purple"}
-            //
-            // else
-            // {return "green"}
           })
 legendLines.append('text')
           .attr("id", "legendText")
@@ -384,14 +359,8 @@ legendLines.append('text')
 }
 
 
-
-
-
 //////we want to show how an individuals' moving average over the semester compares width
 ////the class moving agerave
-
-
-
 
 
 var updateChart = function(data,gradesByDays,listDays,plotLand,name,xScale,yScale, averagesByDay)
@@ -526,18 +495,6 @@ plotLand.append('path')
                   .domain([0,41])
                   .range([0,width])
 
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 var fourLines= function(data, penguin, plotLand, xScale, yScale, height, width, svg, margins)
@@ -572,14 +529,6 @@ var fourLines= function(data, penguin, plotLand, xScale, yScale, height, width, 
     })
     .attr('x',15)
     .attr('y',function(d,i){return (10*i)+12})
-
-
-
-    // d3.selectAll("rect")
-    // .selectAll("#legendText")
-    // .data([0,1,2])
-
-
 
 
 //received help manipulating this data from Kristin D. and Daniel B.
@@ -665,6 +614,13 @@ final.forEach(function(d){
               .attr("stroke", "green")
               .attr("stroke-width", 2)
 
+              plotLand.select('#individual_line')
+              .on("mouseover", function(d){
+                console.log("here")
+                d3.select(this)
+                .attr("stroke-width", 5)
+              })
+
               var homeworkLine=d3.line()
               .x(function(d){
                   return xScale(parseInt(d.day))})
@@ -708,8 +664,6 @@ var legendLines = legend2.selectAll('g')
                           else if(i==2)
                           {return "green"}
 
-
-
                         })
               legendLines.append('text')
                         .attr("id", "legendText")
@@ -729,9 +683,6 @@ var legendLines = legend2.selectAll('g')
                           {return "Tests"}
 
                         })
-
-
-
 
 
                 }
